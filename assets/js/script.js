@@ -57,7 +57,7 @@ var saveTasks = function () {
 // todo look at this example for trimming and removing any white space
 $(".list-group").on("click", "p", function () {
   var text = $(this).text().trim();
-  console.log(text);
+  // console.log(text);
   var textInput = $("<textarea>").addClass("form-control").val(text);
   $(this).replaceWith(textInput);
   textInput.trigger("focus");
@@ -123,6 +123,74 @@ $(".list-group").on("click", "span", function () {
 
     $(this).replaceWith(taskSpan);
   });
+});
+
+//5.3.5
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function (event) {
+    // console.log("activate", this);
+  },
+  deactivate: function (event) {
+    // console.log("deactivate", this);
+  },
+  over: function (event) {
+    // console.log("out", event.target);
+  },
+  out: function (event) {
+    // console.log("over", event.target);
+  },
+  update: function (event) {
+    // console.log("update", this);
+    // console.log($(this).children());
+
+    //array to store the task data in
+    var tempArr = [];
+
+    //loop over current set of children in sortable list
+    $(this)
+      .children()
+      .each(function () {
+        // console.log($(this));
+
+        var text = $(this).find("p").text().trim();
+        var date = $(this).find("span").text().trim();
+        // console.log(text, date);
+
+        //add task data to the temp array as an object
+        tempArr.push({
+          text: text,
+          date: date,
+        });
+      });
+    // console.log(tempArr);
+
+    //trim down list's id to match object property
+    var arrName = $(this).attr("id").replace("list-", "");
+
+    //update array on tasks object and save
+    tasks[arrName] = tempArr;
+    saveTasks();
+  },
+});
+
+//5.3.6 to delete, using drag & drop
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function (event, ui) {
+    console.log("drop");
+    ui.draggable.remove();
+  },
+  over: function (event, ui) {
+    console.log("over");
+  },
+  out: function (event, ui) {
+    console.log("out");
+  },
 });
 
 // modal was triggered
